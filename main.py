@@ -10,6 +10,9 @@ HEIGHT = 1200
 BLACK = (0,0,0)
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 background = pygame.image.load('wallp.jpg')
+clock = pygame.time.Clock()
+caves = pygame.sprite.Group()
+ducks = pygame.sprite.Group()
 
 def win(player):
 		label = font.render("Player " + str(player) + " wins", 1, (255,128,197))
@@ -116,9 +119,6 @@ def main():
 
 
 def start_game():
-	clock = pygame.time.Clock()
-	caves = pygame.sprite.Group()
-	ducks = pygame.sprite.Group()
 
 	rect = screen.get_rect()
 	cave1 = Cave(1,['c1.png', 'c2.png', 'c3.png', 'c2.png'], (WIDTH/2, 0), 100)
