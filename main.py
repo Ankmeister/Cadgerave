@@ -41,6 +41,7 @@ class Cave(pygame.sprite.Sprite):
 		pygame.sprite.Sprite.__init__(self)
 		#For animation
 		self.images = []
+		self.index = 0
 		self.images.append(pygame.image.load('c1.png'))
 		self.images.append(pygame.image.load('c2.png'))
 		self.images.append(pygame.image.load('c3.png'))
