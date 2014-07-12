@@ -11,8 +11,8 @@ ducks2 = pygame.sprite.Group()
 walls = pygame.sprite.Group()
 font = pygame.font.SysFont("Comic Sans MS", 400)
 healthfont = pygame.font.SysFont("Comic Sans MS", 40)
-WIDTH = 1920
-HEIGHT = 1200
+WIDTH = 1280
+HEIGHT = 800
 BLACK = (0,0,0)
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 background = pygame.image.load('wallp.jpg')
@@ -29,10 +29,11 @@ class Duck(pygame.sprite.Sprite):
 	images = []
 	images.append(pygame.image.load('raju1.png'))
 	images.append(pygame.image.load('a1.png'))
-	def __init__(self, position, direction, speed):
+	def __init__(self, position, direction, speed, owner):
 		pygame.sprite.Sprite.__init__(self)
 		self.direction = direction
-		self.speed = max(10,  speed + 20)
+		self.speed = max(10,  speed + 10)
+		self.owner = owner
 		rad = self.direction * math.pi/180
 		self.src_image = self.images[random.randint(0,1)]
 		self.position = position
@@ -46,6 +47,7 @@ class Duck(pygame.sprite.Sprite):
 		y += -self.speed * math.cos(rad)
 		if (x < 0 or y < 0 or x >= WIDTH or y > HEIGHT):
 			self.kill()
+			self.owner.ammo +=1
 
 		self.position = (x,y)
 		self.rect = self.src_image.get_rect()
@@ -57,8 +59,8 @@ class Duck(pygame.sprite.Sprite):
 	
 
 class Cave(pygame.sprite.Sprite):
-	MAX_FORWARD_SPEED = 20
-	MAX_REVERSE_SPEED = -20
+	MAX_FORWARD_SPEED = 10
+	MAX_REVERSE_SPEED = -10
 	ACCELERATION = 2
 	TURN_SPEED = 10
 
@@ -70,7 +72,7 @@ class Cave(pygame.sprite.Sprite):
 		for i in images:
 			self.images.append(pygame.image.load(i))
 
-		self.ammo = 10
+		self.ammo = 5
 		self.playernumber = playernumber
 		self.health = health
 
@@ -121,7 +123,7 @@ class Cave(pygame.sprite.Sprite):
 		global ducks1,ducks2,duck
 		if self.ammo <= 0:
 			return
-		duck = Duck(self.position, self.direction, self.speed)
+		duck = Duck(self.position, self.direction, self.speed, self)
 		if self.playernumber == 1:
 			ducks1.add(duck)
 		else:
@@ -153,7 +155,7 @@ def start_game():
 		for event in pygame.event.get():
 			if not hasattr(event,'key'): continue
 			down = event.type == KEYDOWN
-			if event.key == K_s: 
+			if event.key == K_KP1: 
 				cave2.ducklol()
 			elif event.key == K_RIGHT: 
 				cave2.k_right = down * -cave2.TURN_SPEED
@@ -163,15 +165,15 @@ def start_game():
 				cave2.k_up = down * 2
 			elif event.key == K_DOWN:
 				cave2.k_down = down * 2
-			elif event.key == K_d: 
+			elif event.key == K_f: 
 				cave1.ducklol()
-			elif event.key == K_i: 
+			elif event.key == K_d: 
 				cave1.k_right = down * -cave1.TURN_SPEED
-			elif event.key == K_e:
+			elif event.key == K_a:
 				cave1.k_left = down * cave1.TURN_SPEED
-			elif event.key == K_p:
+			elif event.key == K_w:
 				cave1.k_up = down * 2
-			elif event.key == K_u:
+			elif event.key == K_s:
 				cave1.k_down = down * 2
 			elif event.key == K_ESCAPE: sys.exit(0)	 # quit the game
 		screen.blit(background, [0,0])
