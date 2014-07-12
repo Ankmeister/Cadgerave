@@ -13,23 +13,25 @@ ducks2 = pygame.sprite.Group()
 walls = pygame.sprite.Group()
 font = pygame.font.SysFont("Comic Sans MS", 280)
 playerfont = pygame.font.SysFont("Comic Sans MS", 40)
+countfont = pygame.font.SysFont("Comic Sans MS", 200)
 WIDTH = 1280
 HEIGHT = 800
 BLACK = (0,0,0)
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 background = pygame.image.load('wallp.jpg')
+startbackground = pygame.image.load('splash.jpg')
 clock = pygame.time.Clock()
 
 pygame.mixer.music.load('mus1.ogg')#load music
 quack = pygame.mixer.Sound('kvack.ogg')
 saab = pygame.mixer.Sound('rajula.ogg')
-pygame.mixer.music.play(-1)
+aj = pygame.mixer.Sound('tordead.ogg')
 def win(player):
 		label = font.render("Player " + str(player) + " wins", 1, (255,128,197))
 		print WIDTH - font.get_linesize()
 		screen.blit(label, (((WIDTH - label.get_width())/ 2), (HEIGHT - label.get_height())/2))
 		pygame.display.flip()
-		time.sleep(5000)
+		time.sleep(5)
 		pygame.quit()
 
 class Duck(pygame.sprite.Sprite):
@@ -116,7 +118,7 @@ class Cave(pygame.sprite.Sprite):
 
 	def hit(self):
 		aj.play()
-		self.health -= 10
+		self.health -= 5
 		self.healthbar = playerfont.render(str(self.health),1, (255,0,0))
 		if self.health <= 0:
 			self.kill()
@@ -154,7 +156,9 @@ class Wall(pygame.sprite.Sprite):
 
 	
 def main():
+	pygame.mixer.music.play(-1)
 	for t in range(50,0,-1):
+		screen.blit(startbackground, [0,0])
 		introPlayerOne = []
 		introPlayerTwo = []
 		rand = random.randint(0,255)
@@ -170,19 +174,18 @@ def main():
 		introPlayerTwo.append(playerfont.render("Move down: Down-arrow",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
 		introPlayerTwo.append(playerfont.render("Move right: Right-arrow",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
 		introPlayerTwo.append(playerfont.render("Shoot: CTRL",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
-		screen.fill(BLACK)
 		a = 100
 		for i in introPlayerOne:
 			screen.blit(i, (100,a))
 			a += 40
 		a = 100
 		for i in introPlayerTwo:
-			screen.blit(i, (700,a))
+			screen.blit(i, (900,a))
 			a += 40
-		screen.blit(playerfont.render("Game starts in " + str(t/10.0),1, (random.randint(0,255),
+		screen.blit(countfont.render("Game starts in " + str(t/10.0),1, (random.randint(0,255),
 																	random.randint(0,255),
 																	random.randint(0,255))),
-																	 (400,600))
+																	 (0,500))
 		time.sleep(0.1)
 		pygame.display.flip()
 	
@@ -190,6 +193,9 @@ def main():
 
 
 def start_game():
+	pygame.mixer.music.stop()
+	pygame.mixer.music.load('mus1.ogg')#load music
+	pygame.mixer.music.play(-1)
 
 	rect = screen.get_rect()
 	cave1 = Cave(1,['c1.png', 'c2.png', 'c3.png', 'c2.png'], (100, 100), 100)
