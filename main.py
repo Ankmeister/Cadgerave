@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import time
 from pygame.locals import *
 import pygame, math, sys, random
@@ -15,6 +17,7 @@ trains2 = pygame.sprite.Group()
 walls = pygame.sprite.Group()
 font = pygame.font.SysFont("Comic Sans MS", 280)
 playerfont = pygame.font.SysFont("Comic Sans MS", 40)
+introintrofont = pygame.font.SysFont("Comic Sans MS", 120)
 countfont = pygame.font.SysFont("Comic Sans MS", 200)
 WIDTH = 1280
 HEIGHT = 800
@@ -207,6 +210,15 @@ class Cave(pygame.sprite.Sprite):
 	
 def main():
 	pygame.mixer.music.play(-1)
+	introintro = introintrofont.render("A long cave ago, in a grotta far far borta....",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255)))
+	for x in range(WIDTH + 1000):
+		screen.fill(BLACK)
+		screen.blit(introintro, (WIDTH - x, x / 3))
+		pygame.display.flip()
+
+
+
+
 	for t in range(100,0,-1):
 		screen.blit(startbackground, [0,0])
 		introPlayerOne = []
