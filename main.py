@@ -19,7 +19,7 @@ countfont = pygame.font.SysFont("Comic Sans MS", 200)
 WIDTH = 1280
 HEIGHT = 800
 BLACK = (0,0,0)
-screen = pygame.display.set_mode((WIDTH,HEIGHT))
+screen = pygame.display.set_mode((WIDTH,HEIGHT), FULLSCREEN)
 background = pygame.image.load('wallp.jpg')
 startbackground = pygame.image.load('splash.jpg')
 clock = pygame.time.Clock()
@@ -113,7 +113,7 @@ class Cave(pygame.sprite.Sprite):
 			self.images.append(pygame.image.load(i))
 
 		self.ammo = 7
-		self.trains = 3
+		self.trains = 5
 		self.playernumber = playernumber
 		self.health = health
 
@@ -187,7 +187,7 @@ class Cave(pygame.sprite.Sprite):
 	
 	def changeAmmo(self,n):
 		self.ammo += n
-		self.ammobar = playerfont.render(str(self.ammo),1, (0,255,0))
+		self.ammobar = playerfont.render(str(self.ammo),1, (200,200,50))
 	
 	def changeTrainAmmo(self,n):
 		self.trains +=n
