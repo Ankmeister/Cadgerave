@@ -22,18 +22,29 @@ BLACK = (0,0,0)
 screen = pygame.display.set_mode((WIDTH,HEIGHT), FULLSCREEN)
 background = pygame.image.load('wallp.jpg')
 startbackground = pygame.image.load('splash.jpg')
+endbackground1 = pygame.image.load('win1.png')
+endbackground2 = pygame.image.load('win2.png')
 clock = pygame.time.Clock()
 
 pygame.mixer.music.load('start.ogg')#load music
 quack = pygame.mixer.Sound('kvack.ogg')
 saab = pygame.mixer.Sound('rajula.ogg')
 aj = pygame.mixer.Sound('tordead.ogg')
+end = pygame.mixer.Sound('lalala.ogg')
 def win(player):
+		pygame.mixer.music.stop()
+		pygame.mixer.music.load('lalala.ogg')
+		pygame.mixer.music.play(-1)
+		if player == 1:
+			screen.blit(endbackground1, [0,0])
+		else:
+			screen.blit(endbackground2, [0,0])
 		label = font.render("Player " + str(player) + " wins", 1, (255,128,197))
 		screen.blit(label, (((WIDTH - label.get_width())/ 2), (HEIGHT - label.get_height())/2))
 		pygame.display.flip()
-		time.sleep(5)
+		time.sleep(15)
 		pygame.quit()
+		sys.exit()
 
 class Train(pygame.sprite.Sprite):
 	images = []
@@ -187,11 +198,11 @@ class Cave(pygame.sprite.Sprite):
 	
 	def changeAmmo(self,n):
 		self.ammo += n
-		self.ammobar = playerfont.render(str(self.ammo),1, (200,200,50))
+		self.ammobar = playerfont.render(str(self.ammo),1, (0,255,50))
 	
 	def changeTrainAmmo(self,n):
 		self.trains +=n
-		self.trainammo = playerfont.render(str(self.trains),1, (0,255,0))
+		self.trainammo = playerfont.render(str(self.trains),1, (200,200,50))
 
 	
 def main():
@@ -223,10 +234,14 @@ def main():
 		for i in introPlayerTwo:
 			screen.blit(i, (900,a))
 			a += 40
+		screen.blit(playerfont.render("Every player har 7 ankor and 5 trains som kan vara on the screen at the samtidigt",1, (random.randint(0,255),
+																	random.randint(0,255),
+																	random.randint(0,255))),
+																	 (100,500))
 		screen.blit(countfont.render("Game starts in " + str(t/10.0),1, (random.randint(0,255),
 																	random.randint(0,255),
 																	random.randint(0,255))),
-																	 (0,500))
+																	 (0,600))
 		time.sleep(0.1)
 		pygame.display.flip()
 	
