@@ -41,7 +41,7 @@ class Duck(pygame.sprite.Sprite):
 		self.speed = max(10,  speed + 10)
 		self.owner = owner
 		rad = self.direction * math.pi/180
-		self.src_image = self.images[random.randint(0,1)]
+		self.src_image = self.images[self.owner.playernumber - 1]
 		self.position = position
 		self.k_left = self.k_right = 0
 
@@ -197,17 +197,19 @@ def start_game():
 		ducks2.draw(screen)
 		FiredDucks1 = pygame.sprite.groupcollide(ducks1, walls, False, True)
 		FiredDucks2 = pygame.sprite.groupcollide(ducks2, walls, False, True)
-		hits = pygame.sprite.groupcollide(caves1,ducks2,False, True)
-		hits2 = pygame.sprite.groupcollide(caves2,ducks1,False, True)
+		hits = pygame.sprite.groupcollide(caves1,ducks2,False, False)
+		hits2 = pygame.sprite.groupcollide(caves2,ducks1,False, False)
 
-		for cave in hits.keys():
-			cave.hit()
-		for cave in hits2.keys():
-			cave.hit()
-		for duck1 in FiredDucks1:
-			duck1.bounce()
-		for duck2 in FiredDucks2:
-			duck2.bounce()
+		for h in [hits,hits2]:
+			for cave in h.keys():
+				cave.hit()
+			for d in h.values():
+				for duck in d:
+					duck.owner.ammo += 1
+					duck.kill()
+		for d in [FiredDucks1, FiredDucks2]:
+			for duck in d:
+				duck.bounce()
 		for w in walls:
 			pygame.draw.rect(screen, (random.randint(0,255),random.randint(0,255),random.randint(0,255)), w.rect)
 
