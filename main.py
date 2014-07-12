@@ -194,7 +194,7 @@ class Cave(pygame.sprite.Sprite):
 	
 def main():
 	pygame.mixer.music.play(-1)
-	for t in range(5,0,-1):
+	for t in range(100,0,-1):
 		screen.blit(startbackground, [0,0])
 		introPlayerOne = []
 		introPlayerTwo = []
