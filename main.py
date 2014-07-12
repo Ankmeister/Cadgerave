@@ -11,8 +11,8 @@ caves2 = pygame.sprite.Group()
 ducks1 = pygame.sprite.Group()
 ducks2 = pygame.sprite.Group()
 walls = pygame.sprite.Group()
-font = pygame.font.SysFont("Comic Sans MS", 400)
-healthfont = pygame.font.SysFont("Comic Sans MS", 40)
+font = pygame.font.SysFont("Comic Sans MS", 280)
+playerfont = pygame.font.SysFont("Comic Sans MS", 40)
 WIDTH = 1280
 HEIGHT = 800
 BLACK = (0,0,0)
@@ -20,9 +20,10 @@ screen = pygame.display.set_mode((WIDTH,HEIGHT))
 background = pygame.image.load('wallp.jpg')
 clock = pygame.time.Clock()
 
-pygame.mixer.music.load('mus1.wav')#load music
+#pygame.mixer.music.load('mus1.wav')#load music
 quack = pygame.mixer.Sound('kvack.ogg')
-saab = pygame.mixer.Sound('kvack.ogg')
+saab = pygame.mixer.Sound('rajula.ogg')
+aj = pygame.mixer.Sound('tordead.ogg')
 #pygame.mixer.music.play(-1)
 def win(player):
 		label = font.render("Player " + str(player) + " wins", 1, (255,128,197))
@@ -30,6 +31,7 @@ def win(player):
 		screen.blit(label, (((WIDTH - label.get_width())/ 2), (HEIGHT - label.get_height())/2))
 		pygame.display.flip()
 		time.sleep(5000)
+		pygame.quit()
 
 class Duck(pygame.sprite.Sprite):
 	images = []
@@ -53,8 +55,7 @@ class Duck(pygame.sprite.Sprite):
 		y += -self.speed * math.cos(rad)
 		if (x < 0 or y < 0 or x >= WIDTH or y > HEIGHT):
 			self.kill()
-			self.owner.ammo +=1
-
+			self.owner.changeAmmo(1)
 		self.position = (x,y)
 		self.rect = self.src_image.get_rect()
 		self.rect.center = self.position
@@ -78,7 +79,7 @@ class Cave(pygame.sprite.Sprite):
 		for i in images:
 			self.images.append(pygame.image.load(i))
 
-		self.ammo = 5
+		self.ammo = 7
 		self.playernumber = playernumber
 		self.health = health
 
@@ -87,7 +88,8 @@ class Cave(pygame.sprite.Sprite):
 		self.speed = self.direction = 0
 		self.k_up = self.k_down = self.k_left = self.k_right = 0
 
-		self.healthbar = healthfont.render(str(self.health),1, (255,0,0))
+		self.healthbar = playerfont.render(str(self.health),1, (255,0,0))
+		self.ammobar = playerfont.render(str(self.ammo),1, (0,255,0))
 		screen.blit(self.healthbar, self.position)
 	
 	def update(self,deltat):
@@ -109,12 +111,14 @@ class Cave(pygame.sprite.Sprite):
 		tjenna = pygame.transform.scale(self.image, (self.image.get_width()/2, self.image.get_height()/2))
 		self.rect = tjenna.get_rect()
 		self.rect.center = self.position
-		screen.blit(self.healthbar, (self.position[0], self.position[1] - 50))
+		screen.blit(self.healthbar, (self.position[0] - 30, self.position[1] - 50))
+		screen.blit(self.ammobar, (self.position[0] + 30, self.position[1] - 50))
 
 
 	def hit(self):
+		aj.play()
 		self.health -= 10
-		self.healthbar = healthfont.render(str(self.health),1, (255,0,0))
+		self.healthbar = playerfont.render(str(self.health),1, (255,0,0))
 		if self.health <= 0:
 			self.kill()
 			winner =  1 + (self.playernumber % 2)
@@ -132,11 +136,16 @@ class Cave(pygame.sprite.Sprite):
 		duck = Duck(self.position, self.direction, self.speed, self)
 		if self.playernumber == 1:
 			ducks1.add(duck)
-			quack.play()
+			saab.play()
 		else:
 			ducks2.add(duck)
 			quack.play()
-		self.ammo -=1
+		self.changeAmmo(-1)
+	
+	def changeAmmo(self,n):
+		self.ammo += n
+		self.ammobar = playerfont.render(str(self.ammo),1, (0,255,0))
+	
 
 class Wall(pygame.sprite.Sprite):
 	def __init__(self, position, width, height):
@@ -146,6 +155,38 @@ class Wall(pygame.sprite.Sprite):
 
 	
 def main():
+	for t in range(50,0,-1):
+		introPlayerOne = []
+		introPlayerTwo = []
+		rand = random.randint(0,255)
+		introPlayerOne.append(playerfont.render("Player one:",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
+		introPlayerOne.append(playerfont.render("Move up: W",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
+		introPlayerOne.append(playerfont.render("Move left: A",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
+		introPlayerOne.append(playerfont.render("Move down: S",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
+		introPlayerOne.append(playerfont.render("Move right: D",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
+		introPlayerOne.append(playerfont.render("Shoot: F",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
+		introPlayerTwo.append(playerfont.render("Player two:",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
+		introPlayerTwo.append(playerfont.render("Move up: Up-arrow",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
+		introPlayerTwo.append(playerfont.render("Move left: Left-arrow",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
+		introPlayerTwo.append(playerfont.render("Move down: Down-arrow",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
+		introPlayerTwo.append(playerfont.render("Move right: Right-arrow",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
+		introPlayerTwo.append(playerfont.render("Shoot: CTRL",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
+		screen.fill(BLACK)
+		a = 100
+		for i in introPlayerOne:
+			screen.blit(i, (100,a))
+			a += 40
+		a = 100
+		for i in introPlayerTwo:
+			screen.blit(i, (700,a))
+			a += 40
+		screen.blit(playerfont.render("Game starts in " + str(t/10.0),1, (random.randint(0,255),
+																	random.randint(0,255),
+																	random.randint(0,255))),
+																	 (400,600))
+		time.sleep(0.1)
+		pygame.display.flip()
+	
 	start_game()
 
 
@@ -163,7 +204,7 @@ def start_game():
 		for event in pygame.event.get():
 			if not hasattr(event,'key'): continue
 			down = event.type == KEYDOWN
-			if event.key == K_KP1: 
+			if event.key == K_RCTRL: 
 				cave2.ducklol()
 			elif event.key == K_RIGHT: 
 				cave2.k_right = down * -cave2.TURN_SPEED
@@ -205,7 +246,7 @@ def start_game():
 				cave.hit()
 			for d in h.values():
 				for duck in d:
-					duck.owner.ammo += 1
+					duck.owner.changeAmmo(1)
 					duck.kill()
 		for d in [FiredDucks1, FiredDucks2]:
 			for duck in d:
