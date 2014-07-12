@@ -51,7 +51,6 @@ class Train(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.x = self.position[0]
 		self.rect.y = self.position[1]
-		print self.position
 		if owner.playernumber == 1:
 			trains1.add(self)
 		else:
@@ -114,7 +113,7 @@ class Cave(pygame.sprite.Sprite):
 			self.images.append(pygame.image.load(i))
 
 		self.ammo = 7
-		self.trains = 2
+		self.trains = 3
 		self.playernumber = playernumber
 		self.health = health
 
@@ -125,6 +124,7 @@ class Cave(pygame.sprite.Sprite):
 
 		self.healthbar = playerfont.render(str(self.health),1, (255,0,0))
 		self.ammobar = playerfont.render(str(self.ammo),1, (0,255,0))
+		self.trainammo = playerfont.render(str(self.trains),1, (200,200,50))
 		screen.blit(self.healthbar, self.position)
 	
 	def update(self,deltat):
@@ -147,7 +147,8 @@ class Cave(pygame.sprite.Sprite):
 		self.rect = tjenna.get_rect()
 		self.rect.center = self.position
 		screen.blit(self.healthbar, (self.position[0] - 30, self.position[1] - 50))
-		screen.blit(self.ammobar, (self.position[0] + 30, self.position[1] - 50))
+		screen.blit(self.ammobar, (self.position[0] + 50, self.position[1] - 50))
+		screen.blit(self.trainammo, (self.position[0] + 90, self.position[1] - 50))
 
 
 	def hit(self):
@@ -190,11 +191,12 @@ class Cave(pygame.sprite.Sprite):
 	
 	def changeTrainAmmo(self,n):
 		self.trains +=n
+		self.trainammo = playerfont.render(str(self.trains),1, (0,255,0))
 
 	
 def main():
 	pygame.mixer.music.play(-1)
-	for t in range(100,0,-1):
+	for t in range(5,0,-1):
 		screen.blit(startbackground, [0,0])
 		introPlayerOne = []
 		introPlayerTwo = []
