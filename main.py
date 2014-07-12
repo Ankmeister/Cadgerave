@@ -2,6 +2,8 @@ import time
 from pygame.locals import *
 import pygame, math, sys, random
 
+pygame.mixer.pre_init(44100, -16, 2, 2048) # setup mixer to avoid sound lag
+
 pygame.init()
 #This is so ugly
 caves1 = pygame.sprite.Group()
@@ -18,6 +20,10 @@ screen = pygame.display.set_mode((WIDTH,HEIGHT))
 background = pygame.image.load('wallp.jpg')
 clock = pygame.time.Clock()
 
+pygame.mixer.music.load('mus1.wav')#load music
+quack = pygame.mixer.Sound('kvack.ogg')
+saab = pygame.mixer.Sound('kvack.ogg')
+#pygame.mixer.music.play(-1)
 def win(player):
 		label = font.render("Player " + str(player) + " wins", 1, (255,128,197))
 		print WIDTH - font.get_linesize()
@@ -126,8 +132,10 @@ class Cave(pygame.sprite.Sprite):
 		duck = Duck(self.position, self.direction, self.speed, self)
 		if self.playernumber == 1:
 			ducks1.add(duck)
+			quack.play()
 		else:
 			ducks2.add(duck)
+			quack.play()
 		self.ammo -=1
 
 class Wall(pygame.sprite.Sprite):
