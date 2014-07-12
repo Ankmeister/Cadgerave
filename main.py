@@ -17,7 +17,7 @@ trains2 = pygame.sprite.Group()
 walls = pygame.sprite.Group()
 font = pygame.font.SysFont("Comic Sans MS", 280)
 playerfont = pygame.font.SysFont("Comic Sans MS", 40)
-introintrofont = pygame.font.SysFont("Comic Sans MS", 120)
+introintrofont = pygame.font.SysFont("Comic Sans MS", 80)
 countfont = pygame.font.SysFont("Comic Sans MS", 200)
 WIDTH = 1280
 HEIGHT = 800
@@ -53,18 +53,16 @@ class Train(pygame.sprite.Sprite):
 	images = []
 	images.append(pygame.image.load('train.png'))
 	images.append(pygame.image.load('train2.png'))
-	image = pygame.image.load('train.png')
 	def __init__(self,position, direction, owner):
 		pygame.sprite.Sprite.__init__(self)
 		self.position = position
 		self.direction = direction
-		rad = self.direction * math.pi/180
 		self.owner = owner
+
 		self.image = self.images[self.owner.playernumber - 1]
 		self.image = pygame.transform.rotate(self.image, self.direction)
 		self.rect = self.image.get_rect()
-		self.rect.x = self.position[0]
-		self.rect.y = self.position[1]
+		self.rect.center = self.position
 		if owner.playernumber == 1:
 			trains1.add(self)
 		else:
@@ -81,7 +79,6 @@ class Duck(pygame.sprite.Sprite):
 		self.direction = direction
 		self.speed = max(10,  speed + 10)
 		self.owner = owner
-		rad = self.direction * math.pi/180
 		self.src_image = self.images[self.owner.playernumber - 1]
 		self.position = position
 		self.k_left = self.k_right = 0
@@ -130,7 +127,6 @@ class Cave(pygame.sprite.Sprite):
 		self.trains = 5
 		self.playernumber = playernumber
 		self.health = health
-
 		self.image = self.images[0]
 		self.position = position
 		self.speed = self.direction = 0
@@ -174,11 +170,6 @@ class Cave(pygame.sprite.Sprite):
 			winner =  1 + (self.playernumber % 2)
 			win(winner)
 
-	def bounce(self):
-		self.k_up = self.k_down
-		self.k_down = self.k_up
-		self.speed = -self.speed
-
 	def ducklol(self):
 		global ducks1,ducks2,duck
 		if self.ammo <= 0:
@@ -209,15 +200,13 @@ class Cave(pygame.sprite.Sprite):
 
 	
 def main():
+	start_game()
 	pygame.mixer.music.play(-1)
 	introintro = introintrofont.render("A long cave ago, in a grotta far far borta....",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255)))
 	for x in range(WIDTH + 1000):
 		screen.fill(BLACK)
 		screen.blit(introintro, (WIDTH - x, x / 3))
 		pygame.display.flip()
-
-
-
 
 	for t in range(100,0,-1):
 		screen.blit(startbackground, [0,0])
@@ -301,7 +290,7 @@ def start_game():
 				cave1.k_up = down * 2
 			elif event.key == K_s:
 				cave1.k_down = down * 2
-			elif event.key == K_ESCAPE: sys.exit(0)	 # quit the game
+			elif event.key == K_ESCAPE: sys.exit(0)	 
 		screen.blit(background, [0,0])
 
 		#this is so ugly
