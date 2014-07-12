@@ -10,6 +10,8 @@ caves1 = pygame.sprite.Group()
 caves2 = pygame.sprite.Group()
 ducks1 = pygame.sprite.Group()
 ducks2 = pygame.sprite.Group()
+trains1 = pygame.sprite.Group()
+trains2 = pygame.sprite.Group()
 walls = pygame.sprite.Group()
 font = pygame.font.SysFont("Comic Sans MS", 280)
 playerfont = pygame.font.SysFont("Comic Sans MS", 40)
@@ -22,17 +24,40 @@ background = pygame.image.load('wallp.jpg')
 startbackground = pygame.image.load('splash.jpg')
 clock = pygame.time.Clock()
 
-pygame.mixer.music.load('mus1.ogg')#load music
+pygame.mixer.music.load('start.ogg')#load music
 quack = pygame.mixer.Sound('kvack.ogg')
 saab = pygame.mixer.Sound('rajula.ogg')
 aj = pygame.mixer.Sound('tordead.ogg')
 def win(player):
 		label = font.render("Player " + str(player) + " wins", 1, (255,128,197))
-		print WIDTH - font.get_linesize()
 		screen.blit(label, (((WIDTH - label.get_width())/ 2), (HEIGHT - label.get_height())/2))
 		pygame.display.flip()
 		time.sleep(5)
 		pygame.quit()
+
+class Train(pygame.sprite.Sprite):
+	images = []
+	images.append(pygame.image.load('train.png'))
+	images.append(pygame.image.load('train2.png'))
+	image = pygame.image.load('train.png')
+	def __init__(self,position, direction, owner):
+		pygame.sprite.Sprite.__init__(self)
+		self.position = position
+		self.direction = direction
+		rad = self.direction * math.pi/180
+		self.owner = owner
+		self.image = self.images[self.owner.playernumber - 1]
+		self.image = pygame.transform.rotate(self.image, self.direction)
+		self.rect = self.image.get_rect()
+		self.rect.x = self.position[0]
+		self.rect.y = self.position[1]
+		print self.position
+		if owner.playernumber == 1:
+			trains1.add(self)
+		else:
+			trains2.add(self)
+		
+
 
 class Duck(pygame.sprite.Sprite):
 	images = []
@@ -66,6 +91,14 @@ class Duck(pygame.sprite.Sprite):
 		self.direction = random.randint(0,360)
 	
 
+class Wall(pygame.sprite.Sprite):
+	def __init__(self, position, width, height):
+		pygame.sprite.Sprite.__init__(self)
+		self.rect = pygame.Rect(position[0], position[1], width,height)
+		walls.add(self)
+
+
+
 class Cave(pygame.sprite.Sprite):
 	MAX_FORWARD_SPEED = 10
 	MAX_REVERSE_SPEED = -10
@@ -81,6 +114,7 @@ class Cave(pygame.sprite.Sprite):
 			self.images.append(pygame.image.load(i))
 
 		self.ammo = 7
+		self.trains = 2
 		self.playernumber = playernumber
 		self.health = health
 
@@ -143,21 +177,24 @@ class Cave(pygame.sprite.Sprite):
 			quack.play()
 		self.changeAmmo(-1)
 	
+	def trainlol(self):
+		global trains1, trains2, train
+		if self.trains <= 0:
+			return
+		train = Train(self.position, self.direction, self)
+		self.changeTrainAmmo(-1)
+	
 	def changeAmmo(self,n):
 		self.ammo += n
 		self.ammobar = playerfont.render(str(self.ammo),1, (0,255,0))
 	
-
-class Wall(pygame.sprite.Sprite):
-	def __init__(self, position, width, height):
-		pygame.sprite.Sprite.__init__(self)
-		self.rect = pygame.Rect(position[0], position[1], width,height)
-		walls.add(self)
+	def changeTrainAmmo(self,n):
+		self.trains +=n
 
 	
 def main():
 	pygame.mixer.music.play(-1)
-	for t in range(50,0,-1):
+	for t in range(5,0,-1):
 		screen.blit(startbackground, [0,0])
 		introPlayerOne = []
 		introPlayerTwo = []
@@ -168,12 +205,14 @@ def main():
 		introPlayerOne.append(playerfont.render("Move down: S",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
 		introPlayerOne.append(playerfont.render("Move right: D",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
 		introPlayerOne.append(playerfont.render("Shoot: F",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
+		introPlayerOne.append(playerfont.render("Lay train: G",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
 		introPlayerTwo.append(playerfont.render("Player two:",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
 		introPlayerTwo.append(playerfont.render("Move up: Up-arrow",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
 		introPlayerTwo.append(playerfont.render("Move left: Left-arrow",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
 		introPlayerTwo.append(playerfont.render("Move down: Down-arrow",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
 		introPlayerTwo.append(playerfont.render("Move right: Right-arrow",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
 		introPlayerTwo.append(playerfont.render("Shoot: CTRL",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
+		introPlayerTwo.append(playerfont.render("Lay Train: Shift",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255))))
 		a = 100
 		for i in introPlayerOne:
 			screen.blit(i, (100,a))
@@ -211,6 +250,8 @@ def start_game():
 			down = event.type == KEYDOWN
 			if event.key == K_RCTRL: 
 				cave2.ducklol()
+			elif event.key == K_RSHIFT: 
+				cave2.trainlol()
 			elif event.key == K_RIGHT: 
 				cave2.k_right = down * -cave2.TURN_SPEED
 			elif event.key == K_LEFT:
@@ -221,6 +262,8 @@ def start_game():
 				cave2.k_down = down * 2
 			elif event.key == K_f: 
 				cave1.ducklol()
+			elif event.key == K_g: 
+				cave1.trainlol()
 			elif event.key == K_d: 
 				cave1.k_right = down * -cave1.TURN_SPEED
 			elif event.key == K_a:
@@ -241,10 +284,22 @@ def start_game():
 		ducks1.draw(screen)
 		ducks2.update(30)
 		ducks2.draw(screen)
+		trains1.draw(screen)
+		trains2.draw(screen)
 		FiredDucks1 = pygame.sprite.groupcollide(ducks1, walls, False, True)
 		FiredDucks2 = pygame.sprite.groupcollide(ducks2, walls, False, True)
 		hits = pygame.sprite.groupcollide(caves1,ducks2,False, False)
 		hits2 = pygame.sprite.groupcollide(caves2,ducks1,False, False)
+		trainhits1 = pygame.sprite.groupcollide(caves1,trains2,False, True)
+		trainhits2 = pygame.sprite.groupcollide(caves2,trains1,False, True)
+
+		for h in [trainhits1, trainhits2]:
+			for cave in h.keys():
+				cave.hit()
+			for t in h.values():
+				for train in t:
+					train.owner.changeTrainAmmo(1)
+					train.kill()
 
 		for h in [hits,hits2]:
 			for cave in h.keys():
@@ -258,8 +313,6 @@ def start_game():
 				duck.bounce()
 		for w in walls:
 			pygame.draw.rect(screen, (random.randint(0,255),random.randint(0,255),random.randint(0,255)), w.rect)
-
-
 		Wall((random.randint(0,WIDTH),random.randint(0,HEIGHT)),random.randint(0,10),random.randint(1,10))
 		pygame.display.flip()
 
