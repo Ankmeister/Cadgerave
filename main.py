@@ -200,7 +200,6 @@ class Cave(pygame.sprite.Sprite):
 
 	
 def main():
-	start_game()
 	pygame.mixer.music.play(-1)
 	introintro = introintrofont.render("A long cave ago, in a grotta far far borta....",1,(random.randint(0,255), random.randint(0,255), random.randint(0,255)))
 	for x in range(WIDTH + 1000):
